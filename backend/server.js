@@ -3,6 +3,18 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
 
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION:', err.message);
+    console.error(err.stack);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION:', err.message);
+    console.error(err.stack);
+});
+
+
+
 // Import Routes
 import authRoutes from './src/routes/auth.routes.js';
 import courseRoutes from './src/routes/course.routes.js';
