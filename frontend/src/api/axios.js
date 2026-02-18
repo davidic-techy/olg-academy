@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-
+// ✅ REMOVE '/api' from here
 const api = axios.create({
-  baseURL: 'https://olg-backend.onrender.com/api', 
+  baseURL: 'https://olg-backend.onrender.com', 
 });
 
 // Automatically attach Token to every request
