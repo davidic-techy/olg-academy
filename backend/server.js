@@ -23,43 +23,29 @@ connectDB();
 // 2. Middlewares
 app.use(express.json());
 
-// 🛠️ CRITICAL CORS FIX 🛠️
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://olgnova.org',
-  'https://academy.olgnova.org',
-  'https://olg-academy-1.onrender.com'
-];
+// ✅ Correct CORS setup
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://olg-academy-1.onrender.com",
+    ],
+    credentials: true,
+  })
+);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-
-// 🔍 DEBUG LOGGER: This will show us in Render logs exactly what URL is being hit
+// 🔍 DEBUG LOGGER
 app.use((req, res, next) => {
   console.log(`[REQUEST] ${req.method} ${req.url}`);
   next();
 });
 
-// 3. Test Route (To check if server is alive)
+// 3. Test Route
 app.get('/', (req, res) => {
   res.send('API is Live! Send requests to /api/...');
 });
 
 // 4. Register Routes
-// Note: The /api/courses part is defined HERE. 
-// So inside courseRoutes, the path should just be '/'
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
@@ -70,5 +56,5 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
