@@ -25,9 +25,11 @@ const PORT = process.env.PORT || 10000;
 // This configuration allows ANY website to talk to your backend.
 // We removed 'credentials: true' because it conflicts with origin: '*'
 app.use(cors({
-    origin: '*', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: [
+    'http://localhost:5173',
+    'https://olg-academy-1.onrender.com'
+  ],
+  credentials: true
 }));
 
 // ============================================

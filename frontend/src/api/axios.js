@@ -1,15 +1,9 @@
 import axios from 'axios';
 
-// ✅ FIX: We added '/api' to the end so it matches your server
-const BASE_URL = window.location.hostname === 'localhost'
-  ? "http://localhost:10000/api"           // Local: localhost:10000/api
-  : "https://olg-backend.onrender.com/api"; // Live: ...onrender.com/api
-
 const api = axios.create({
-  baseURL: BASE_URL, 
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
-// Automatically attach Token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {

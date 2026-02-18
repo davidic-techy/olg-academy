@@ -5,10 +5,12 @@ import {
   createCourse,
   updateCourse,
   deleteCourse,
+  seedCourses,
 } from '../controllers/course.controller.js';
 
 import { protect, authorize } from '../middlewares/auth.middleware.js';
 import moduleRouter from './module.routes.js';
+
 
 const router = express.Router();
 
@@ -21,7 +23,8 @@ router
   .get(getCourses)
   .post(protect, authorize('tutor', 'admin'), createCourse);
 
-// /api/courses/:id
+  router.route('/seed').post(seedCourses);
+// Route: /api/courses/:id
 router
   .route('/:id')
   .get(getCourse)
