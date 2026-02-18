@@ -24,7 +24,10 @@ connectDB();
 // 3. Middlewares (MUST COME BEFORE ROUTES)
 app.use(cors({
   origin: 'http://localhost:5173',
-  credentials: true
+  "https://olg-academy-1.onrender.com"
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json()); // <--- This must be here!
 
