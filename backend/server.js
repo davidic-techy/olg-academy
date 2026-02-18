@@ -13,35 +13,30 @@ import assignmentRoutes from './src/routes/assignment.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
 
-// 1. Config
-dotenv.config(); // Load env vars first
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 10000; // Render uses port 10000 by default
+const PORT = process.env.PORT || 10000;
 
-// 2. Connect DB
+// 1. Connect Database
 connectDB();
 
-// 3. Middlewares (MUST COME BEFORE ROUTES)
-app.use(express.json()); // Allow JSON data in requests
-
-// 🛠️ FIX: Correct CORS Syntax
+// 2. MIDDLEWARE (The Fix is Here)
+// We allow '*' (Everyone) to fix the error immediately.
 app.use(cors({
-  origin: [
-    "http://localhost:5173",                  // Local Frontend
-    "https://olg-academy-1.onrender.com",     // Your Render Frontend (Preview)
-    "https://olg-academy.onrender.com"        // Your Main Render Frontend (Production)
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: '*', 
+  credentials: true, 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// 4. Routes
+app.use(express.json()); 
+
+// 3. Test Route
 app.get('/', (req, res) => {
-  res.send('API is running....');
+  res.send('API is Live and CORS is Open!');
 });
 
-// API Endpoints
+// 4. API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
@@ -51,7 +46,6 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 5. Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
