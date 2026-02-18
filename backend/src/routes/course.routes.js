@@ -7,25 +7,25 @@ import {
   deleteCourse,
 } from '../controllers/course.controller.js';
 
-// 👇 Import the security guards
 import { protect, authorize } from '../middlewares/auth.middleware.js';
 import moduleRouter from './module.routes.js';
 
 const router = express.Router();
 
+// Nested route
 router.use('/:courseId/modules', moduleRouter);
 
-// Route: /api/courses
+// /api/courses
 router
   .route('/')
-  .get(getCourses) // Public: Anyone can view all courses
-  .post(protect, authorize('tutor', 'admin'), createCourse); // Private: Only Tutors/Admins can create
+  .get(getCourses)
+  .post(protect, authorize('tutor', 'admin'), createCourse);
 
-// Route: /api/courses/:id
+// /api/courses/:id
 router
   .route('/:id')
-  .get(getCourse) // Public: Anyone can view a single course
-  .put(protect, authorize('tutor', 'admin'), updateCourse) // Private: Only Owner/Admin can update
-  .delete(protect, authorize('tutor', 'admin'), deleteCourse); // Private: Only Owner/Admin can delete
+  .get(getCourse)
+  .put(protect, authorize('tutor', 'admin'), updateCourse)
+  .delete(protect, authorize('tutor', 'admin'), deleteCourse);
 
 export default router;
