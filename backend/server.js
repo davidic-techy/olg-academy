@@ -26,10 +26,11 @@ app.use(express.json());
 // ✅ Correct CORS setup
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://olg-academy-1.onrender.com",
-    ],
+    origin: origin: [
+  "http://localhost:5173",
+  "https://olg-academy-1.onrender.com",
+  "https://olg-academy.onrender.com" // <--- Add this just to be safe!
+],
     credentials: true,
   })
 );
