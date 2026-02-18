@@ -20,23 +20,31 @@ const PORT = process.env.PORT || 10000;
 // 1. Connect Database
 connectDB();
 
-// 2. MIDDLEWARE (The Fix is Here)
-// We allow '*' (Everyone) to fix the error immediately.
+// 2. Middlewares
+app.use(express.json());
+
+// 🛠️ CRITICAL CORS FIX 🛠️
 app.use(cors({
-  origin: '*', 
-  credentials: true, 
+  origin: '*', // Allow all connections for now to fix the blockage
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json()); 
-
-// 3. Test Route
-app.get('/', (req, res) => {
-  res.send('API is Live and CORS is Open!');
+// 🔍 DEBUG LOGGER: This will show us in Render logs exactly what URL is being hit
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url}`);
+  next();
 });
 
-// 4. API Routes
+// 3. Test Route (To check if server is alive)
+app.get('/', (req, res) => {
+  res.send('API is Live! Send requests to /api/...');
+});
+
+// 4. Register Routes
+// Note: The /api/courses part is defined HERE. 
+// So inside courseRoutes, the path should just be '/'
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
