@@ -17,36 +17,54 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 1. Connect Database
-connectDB();
+// ============================================
+// 1. CORS - MUST BE THE FIRST MIDDLEWARE
+// ============================================
+app.use(cors({
+    origin: '*', // Allow ALL origins (Fixes the blocking issue immediately)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// 2. Middlewares
+// ============================================
+// 2. Body Parsers (After CORS)
+// ============================================
 app.use(express.json());
 
-// ✅ Correct CORS setup
-app.use(
-  cors({
-    origin: [
-  "http://localhost:5173",
-  "https://olg-academy-1.onrender.com",
-  "https://olg-academy.onrender.com" // <--- Add this just to be safe!
-],
-    credentials: true,
-  })
-);
+// ============================================
+// 3. Connect Database (Async Wrapper)
+// ============================================
+// We wrap this to ensure we don't crash if DB is slow
+const startServer = async () => {
+    try {
+        await connectDB();
+        console.log("✅ Database Connected Successfully");
+        
+        // Only start listening AFTER DB is connected
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ Database Connection Failed:", error);
+        process.exit(1);
+    }
+};
 
-// 🔍 DEBUG LOGGER
+// ============================================
+// 4. Debug Logger (See exactly what URL is hit)
+// ============================================
 app.use((req, res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.url}`);
-  next();
+    console.log(`[REQUEST] ${req.method} ${req.url}`);
+    next();
 });
 
-// 3. Test Route
+// ============================================
+// 5. Routes
+// ============================================
 app.get('/', (req, res) => {
-  res.send('API is Live! Send requests to /api/...');
+    res.send('API is Live! Send requests to /api/courses');
 });
 
-// 4. Register Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
@@ -56,6 +74,14 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// ============================================
+// 6. 404 Handler (Crucial for Debugging)
+// ============================================
+// If no route matches, this prints why
+app.use('*', (req, res) => {
+    console.log(`[ERROR] 404 Not Found: ${req.originalUrl}`);
+    res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });
+
+// Start the server
+startServer();
