@@ -24,12 +24,27 @@ connectDB();
 app.use(express.json());
 
 // 🛠️ CRITICAL CORS FIX 🛠️
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://olgnova.org',
+  'https://academy.olgnova.org',
+  'https://olg-academy-1.onrender.com'
+];
+
 app.use(cors({
-  origin: '*', // Allow all connections for now to fix the blockage
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 // 🔍 DEBUG LOGGER: This will show us in Render logs exactly what URL is being hit
 app.use((req, res, next) => {
