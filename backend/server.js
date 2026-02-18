@@ -15,56 +15,41 @@ import adminRoutes from './src/routes/admin.routes.js';
 
 dotenv.config();
 const app = express();
+
+// Use Render's port or default to 10000
 const PORT = process.env.PORT || 10000;
 
 // ============================================
 // 1. CORS - MUST BE THE FIRST MIDDLEWARE
 // ============================================
+// This configuration allows ANY website to talk to your backend.
+// We removed 'credentials: true' because it conflicts with origin: '*'
 app.use(cors({
-    origin: '*', // Allow ALL origins (Fixes the blocking issue immediately)
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // ============================================
-// 2. Body Parsers (After CORS)
+// 2. Body Parsers & Logger
 // ============================================
 app.use(express.json());
 
-// ============================================
-// 3. Connect Database (Async Wrapper)
-// ============================================
-// We wrap this to ensure we don't crash if DB is slow
-const startServer = async () => {
-    try {
-        await connectDB();
-        console.log("✅ Database Connected Successfully");
-        
-        // Only start listening AFTER DB is connected
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error("❌ Database Connection Failed:", error);
-        process.exit(1);
-    }
-};
-
-// ============================================
-// 4. Debug Logger (See exactly what URL is hit)
-// ============================================
+// Debug Logger: See exactly what requests are coming in
 app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.url}`);
     next();
 });
 
 // ============================================
-// 5. Routes
+// 3. Routes
 // ============================================
+// Root Route - To verify server is alive
 app.get('/', (req, res) => {
     res.send('API is Live! Send requests to /api/courses');
 });
 
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
@@ -75,13 +60,31 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
 // ============================================
-// 6. 404 Handler (Crucial for Debugging)
+// 4. 404 Handler (FIXED)
 // ============================================
-// If no route matches, this prints why
-app.use('*', (req, res) => {
+// ⚠️ IMPORTANT: We removed the '*' string here because it causes
+// the "PathError: Missing parameter name" crash in newer Express versions.
+// Using just the function catches all remaining requests.
+app.use((req, res) => {
     console.log(`[ERROR] 404 Not Found: ${req.originalUrl}`);
     res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });
 
-// Start the server
+// ============================================
+// 5. Connect Database & Start Server
+// ============================================
+const startServer = async () => {
+    try {
+        await connectDB();
+        console.log("✅ Database Connected Successfully");
+        
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ Database Connection Failed:", error);
+        process.exit(1);
+    }
+};
+
 startServer();
